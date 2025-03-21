@@ -31,22 +31,14 @@ interface Coin {
   name: string;
   symbol: string;
   market_data: {
-    current_price: {
-      usd: number;
-    };
+    current_price: { usd: number };
     market_cap_rank: number;
     circulating_supply: number;
     total_supply: number | null;
-    high_24h: {
-      usd: number;
-    };
-    low_24h: {
-      usd: number;
-    };
+    high_24h: { usd: number };
+    low_24h: { usd: number };
   };
-  description: {
-    en: string;
-  };
+  description: { en: string };
 }
 
 interface ChartData {
@@ -62,6 +54,19 @@ interface ChartData {
   }[];
 }
 
+
+export async function generateStaticParams() {
+  const res = await axios.get(
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1"
+  );
+
+  const coins = res.data;
+
+  return coins.map((coin: { id: string }) => ({
+    id: coin.id,
+  }));
+}
+
 const CoinDetailsPage = () => {
   const [coin, setCoin] = useState<Coin | null>(null);
   const [prices, setPrices] = useState<[number, number][]>([]);
@@ -69,7 +74,7 @@ const CoinDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { id } = useParams() as { id: string }; // ✅ Added type assertion to fix `any` error
+  const { id } = useParams() as { id: string };
 
   useEffect(() => {
     const fetchCoinData = async () => {
