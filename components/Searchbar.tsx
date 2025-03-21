@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from "next/image";
 import axios from 'axios';
 import Fuse from 'fuse.js';
@@ -23,23 +23,25 @@ export default function Searchbar() {
 
   const API = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=60&page=1&sparkline=false`;
 
-  const fetchCoins = async (): Promise<void> => {
+  // ✅ Use useCallback to prevent unnecessary re-renders and fix dependency warning
+  const fetchCoins = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
       const res = await axios.get<Crypto[]>(API);
       setSearchResults(res.data);
-    } catch (err) {
+    } catch {
       setError('Oops! Something went wrong. Please try again later.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [API]);
 
   useEffect(() => {
     fetchCoins();
-  }, []);
+  }, [fetchCoins]);
 
+  // ✅ Improved search efficiency with Fuse.js
   const fuse = new Fuse(searchResults, {
     keys: ['name', 'symbol'],
     threshold: 0.4,
@@ -56,7 +58,7 @@ export default function Searchbar() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
       <h1 className="text-center text-4xl font-bold text-green-500 mb-8">Search Cryptocurrencies</h1>
-      
+
       <div className="flex justify-center items-center">
         <div className="relative w-full max-w-md">
           <input

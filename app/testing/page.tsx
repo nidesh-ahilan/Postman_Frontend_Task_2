@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
@@ -20,7 +20,8 @@ export default function Page() {
 
   const API_KEY = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=${page}&sparkline=false`;
 
-  const fetchCoins = async () => {
+  // ✅ Memoized fetch function using useCallback to avoid missing dependency warning
+  const fetchCoins = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -31,19 +32,20 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_KEY]);
 
   useEffect(() => {
     fetchCoins();
     const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     setFavorites(savedFavorites);
-  }, [page]);
+  }, [fetchCoins, page]);
 
   const handleFavorite = (coin: Coin) => {
     const isFavorite = favorites.some((fav) => fav.id === coin.id);
     const updatedFavorites = isFavorite
       ? favorites.filter((fav) => fav.id !== coin.id)
       : [...favorites, coin];
+
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     setFavorites(updatedFavorites);
   };

@@ -49,14 +49,27 @@ interface Coin {
   };
 }
 
+interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    fill: boolean;
+    borderColor: string;
+    backgroundColor: string;
+    tension: number;
+    pointBackgroundColor: string;
+  }[];
+}
+
 const CoinDetailsPage = () => {
   const [coin, setCoin] = useState<Coin | null>(null);
   const [prices, setPrices] = useState<[number, number][]>([]);
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { id } = useParams();
+  const { id } = useParams() as { id: string }; // ✅ Added type assertion to fix `any` error
 
   useEffect(() => {
     const fetchCoinData = async () => {
