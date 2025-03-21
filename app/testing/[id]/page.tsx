@@ -52,19 +52,6 @@ interface ChartData {
   }[];
 }
 
-
-export async function generateStaticParams() {
-  const res = await axios.get(
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1"
-  );
-
-  const coins = res.data;
-
-  return coins.map((coin: { id: string }) => ({
-    id: coin.id,
-  }));
-}
-
 const CoinDetailsPage = () => {
   const [coin, setCoin] = useState<Coin | null>(null);
   const [prices, setPrices] = useState<[number, number][]>([]);
