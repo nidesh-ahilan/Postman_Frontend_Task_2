@@ -23,7 +23,7 @@ export default function Searchbar() {
 
   const API = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=60&page=1&sparkline=false`;
 
-  // ✅ Use useCallback to prevent unnecessary re-renders and fix dependency warning
+
   const fetchCoins = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -41,7 +41,6 @@ export default function Searchbar() {
     fetchCoins();
   }, [fetchCoins]);
 
-  // ✅ Improved search efficiency with Fuse.js
   const fuse = new Fuse(searchResults, {
     keys: ['name', 'symbol'],
     threshold: 0.4,
