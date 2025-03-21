@@ -1,11 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { format } from 'date-fns';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { format } from "date-fns";
+import { useParams } from "next/navigation";
 
 ChartJS.register(
   CategoryScale,
@@ -17,29 +26,54 @@ ChartJS.register(
   Legend
 );
 
+interface Coin {
+  id: string;
+  name: string;
+  symbol: string;
+  market_data: {
+    current_price: {
+      usd: number;
+    };
+    market_cap_rank: number;
+    circulating_supply: number;
+    total_supply: number | null;
+    high_24h: {
+      usd: number;
+    };
+    low_24h: {
+      usd: number;
+    };
+  };
+  description: {
+    en: string;
+  };
+}
+
 const CoinDetailsPage = () => {
-  const [coin, setCoin] = useState<any>(null);
-  const [prices, setPrices] = useState<any[]>([]);
+  const [coin, setCoin] = useState<Coin | null>(null);
+  const [prices, setPrices] = useState<[number, number][]>([]);
   const [chartData, setChartData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { id } = useParams() 
+  const { id } = useParams();
 
-    useEffect(() => {
-
+  useEffect(() => {
     const fetchCoinData = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const [coinDetailsResponse, priceDataResponse] = await axios.all([
           axios.get(`https://api.coingecko.com/api/v3/coins/${id}`),
-          axios.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=7`),
+          axios.get(
+            `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=7`
+          ),
         ]);
 
         setCoin(coinDetailsResponse.data);
         setPrices(priceDataResponse.data.prices);
-      } catch (err) {
+      } catch {
         setError("Unable to fetch data.");
       } finally {
         setLoading(false);
@@ -47,12 +81,14 @@ const CoinDetailsPage = () => {
     };
 
     fetchCoinData();
-  }, [id]); 
+  }, [id]);
 
   useEffect(() => {
     if (prices.length > 0) {
-      const dates = prices.map((price: any) => format(new Date(price[0]), 'MM/dd'));
-      const priceData = prices.map((price: any) => price[1]);
+      const dates = prices.map((price) =>
+        format(new Date(price[0]), "MM/dd")
+      );
+      const priceData = prices.map((price) => price[1]);
 
       setChartData({
         labels: dates,
@@ -91,24 +127,22 @@ const CoinDetailsPage = () => {
                 <p className="text-2xl font-bold text-green-600">
                   💰 Current Value: ${coin.market_data.current_price?.usd.toFixed(2)}
                 </p>
-                <p className="text-gray-600 dark:text-white">🔹 Symbol: {coin.symbol.toUpperCase()}</p>
-                <p className="text-gray-600 dark:text-white">🏅 Rank: #{coin.market_data.market_cap_rank}</p>
-                <p className="text-gray-600 dark:text-white">
+                <p>🔹 Symbol: {coin.symbol.toUpperCase()}</p>
+                <p>🏅 Rank: #{coin.market_data.market_cap_rank}</p>
+                <p>
                   🔄 Circulating Supply: {coin.market_data.circulating_supply.toLocaleString()}
                 </p>
-                <p className="text-gray-600 dark:text-white">
+                <p>
                   📦 Total Supply: {coin.market_data.total_supply?.toLocaleString() || "N/A"}
                 </p>
-                <p className="text-gray-600 dark:text-white">
-                  📈 24h High: ${coin.market_data.high_24h?.usd.toFixed(2)}
-                </p>
-                <p className="text-gray-600 dark:text-white">
-                  📉 24h Low: ${coin.market_data.low_24h?.usd.toFixed(2)}
-                </p>
+                <p>📈 24h High: ${coin.market_data.high_24h?.usd.toFixed(2)}</p>
+                <p>📉 24h Low: ${coin.market_data.low_24h?.usd.toFixed(2)}</p>
               </div>
 
               <div className="bg-gray-50 shadow-md rounded-lg p-8 dark:bg-gray-800">
-                <h2 className="text-2xl font-bold text-green-500 mb-4">📄 Description</h2>
+                <h2 className="text-2xl font-bold text-green-500 mb-4">
+                  📄 Description
+                </h2>
                 <p className="text-gray-700 leading-relaxed text-sm dark:text-gray-200">
                   {coin.description.en}
                 </p>
@@ -116,11 +150,15 @@ const CoinDetailsPage = () => {
             </div>
 
             <div className="bg-gray-50 shadow-md rounded-lg p-8 mt-8 dark:bg-gray-800">
-              <h2 className="text-2xl font-bold text-green-500 mb-4">📊 7-Day Price Trend</h2>
+              <h2 className="text-2xl font-bold text-green-500 mb-4">
+                📊 7-Day Price Trend
+              </h2>
               {chartData ? (
                 <Line data={chartData} />
               ) : (
-                <div className="text-center text-gray-500 dark:text-white">Chart not available</div>
+                <div className="text-center text-gray-500 dark:text-white">
+                  Chart not available
+                </div>
               )}
             </div>
           </div>
@@ -131,4 +169,3 @@ const CoinDetailsPage = () => {
 };
 
 export default CoinDetailsPage;
-

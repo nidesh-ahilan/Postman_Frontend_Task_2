@@ -26,7 +26,7 @@ export default function Page() {
     try {
       const res = await axios.get(API_KEY);
       setCoins(res.data);
-    } catch (err) {
+    } catch {
       setError("Oops! Something went wrong. Please try again later.");
     } finally {
       setLoading(false);
@@ -40,9 +40,9 @@ export default function Page() {
   }, [page]);
 
   const handleFavorite = (coin: Coin) => {
-    const isFavorite = favorites.some(fav => fav.id === coin.id);
-    const updatedFavorites = isFavorite 
-      ? favorites.filter(fav => fav.id !== coin.id)
+    const isFavorite = favorites.some((fav) => fav.id === coin.id);
+    const updatedFavorites = isFavorite
+      ? favorites.filter((fav) => fav.id !== coin.id)
       : [...favorites, coin];
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     setFavorites(updatedFavorites);
@@ -63,27 +63,38 @@ export default function Page() {
         </div>
       ) : (
         <>
-          <h1 className="text-4xl text-center bg-green-400 p-10 font-bold mb-6">Top 50 Cryptocurrencies</h1>
+          <h1 className="text-4xl text-center bg-green-400 p-10 font-bold mb-6">
+            Top 50 Cryptocurrencies
+          </h1>
           <div>
             <ul className="space-y-4">
               {coins.map((coin) => (
-                <li key={coin.id} className="bg-white hover:bg-gray-100 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                <li
+                  key={coin.id}
+                  className="bg-white hover:bg-gray-100 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+                >
                   <div className="flex justify-between items-center">
                     <div className="space-y-2">
-                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">{coin.name}</h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{coin.symbol.toUpperCase()}</p>
+                      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                        {coin.name}
+                      </h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {coin.symbol.toUpperCase()}
+                      </p>
                     </div>
                     <div className="font-bold text-xl text-green-500">
                       ${coin.current_price.toFixed(2)}
                     </div>
                   </div>
                   <div className="flex justify-between items-center mt-4">
-                    <Link href={`/testing/${coin.id}`} className="text-blue-500">View Details</Link>
+                    <Link href={`/testing/${coin.id}`} className="text-blue-500">
+                      View Details
+                    </Link>
                     <button
                       onClick={() => handleFavorite(coin)}
                       className="text-red-500 text-2xl cursor-pointer"
                     >
-                      {favorites.some(fav => fav.id === coin.id) ? '🗑️' : '❤️'}
+                      {favorites.some((fav) => fav.id === coin.id) ? '🗑️' : '❤️'}
                     </button>
                   </div>
                 </li>

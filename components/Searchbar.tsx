@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import Image from "next/image";
@@ -54,9 +54,10 @@ export default function Searchbar() {
   };
 
   return (
-    <div>
-      <h1 className="text-center text-5xl pt-10 dark:text-white">Explore any Cryptocurrency</h1>
-      <div className="flex justify-center items-center mt-10">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
+      <h1 className="text-center text-4xl font-bold text-green-500 mb-8">Search Cryptocurrencies</h1>
+      
+      <div className="flex justify-center items-center">
         <div className="relative w-full max-w-md">
           <input
             type="text"
@@ -71,7 +72,7 @@ export default function Searchbar() {
         </div>
       </div>
 
-      {loading && <p className="text-center mt-4 dark:text-white">Loading...</p>}
+      {loading && <p className="text-center mt-4 text-gray-600 dark:text-gray-300">Loading...</p>}
       {error && <p className="text-center text-red-500 mt-4">{error}</p>}
 
       {searchTerm && filteredResults.length > 0 && (
@@ -80,7 +81,7 @@ export default function Searchbar() {
             {filteredResults.map((crypto) => (
               <li
                 key={crypto.id}
-                className="p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 dark:hover: text-black bg-gray-600"
+                className="p-3 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 dark:bg-gray-800 dark:text-white"
               >
                 <Link href={`/testing/${crypto.id}`}>
                   <div>
@@ -95,7 +96,7 @@ export default function Searchbar() {
 
       {searchTerm && filteredResults.length === 0 && (
         <div className="mt-5 max-w-md mx-auto">
-          <p className="text-center text-gray-500">No results found</p>
+          <p className="text-center text-gray-500 dark:text-gray-300">No results found</p>
         </div>
       )}
     </div>
